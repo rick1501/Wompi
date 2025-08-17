@@ -1,0 +1,225 @@
+{
+	"info": {
+		"_postman_id": "19905695-bd32390d-7996-4206-b58b-08b0a4f6bad2",
+		"name": "Wompi Sandbox PSE",
+		"description": "Colección para pruebas PSE en Wompi Sandbox con firma y delay integrado",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Pruebas PSE",
+			"item": [
+				{
+					"name": "PSE - Pago Exitoso",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const delay = ms => new Promise(res => setTimeout(res, ms));",
+									"(async () => { await delay(1000); })();",
+									"const CryptoJS = require(\"crypto-js\");",
+									"let reference = pm.variables.replaceIn(\"{{reference}}\");",
+									"let amount_in_cents = pm.variables.replaceIn(\"{{amount_in_cents}}\");",
+									"let currency = \"COP\";",
+									"let integrity_key = pm.environment.get(\"integrity_key\");",
+									"let signature_string = reference + amount_in_cents + currency + integrity_key;",
+									"let signature_hash = CryptoJS.SHA256(signature_string).toString(CryptoJS.enc.Hex);",
+									"pm.environment.set(\"signature\", signature_hash);"
+								],
+								"id": "8ae0c033-ed42-4a95-9976-a9ef65489826"
+							}
+						}
+					],
+					"id": "19905695-8d10a856-13af-476e-aaf4-cfc3345eb33d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{private_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount_in_cents\": \"{{amount_in_cents}}\",\n  \"currency\": \"COP\",\n  \"payment_method\": {\n    \"type\": \"PSE\",\n    \"user_type\": 0,\n    \"user_legal_id_type\": \"CC\",\n    \"user_legal_id\": \"123456789\",\n    \"financial_institution_code\": \"1001\",\n    \"payment_description\": \"Pago de prueba PSE\"\n  },\n  \"customer_email\": \"test@example.com\",\n  \"reference\": \"{{reference}}\",\n  \"acceptance_token\": \"{{acceptance_token}}\",\n  \"signature\": \"{{signature}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PSE - Pago Rechazado",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "00d0806c-d520-4135-a959-1cf13c7586e0",
+								"exec": [
+									"const delay = ms => new Promise(res => setTimeout(res, ms));",
+									"(async () => { await delay(1000); })();",
+									"const CryptoJS = require(\"crypto-js\");",
+									"let reference = \"pago-pse-002\";",
+									"let amount_in_cents = \"999999999\";",
+									"let currency = \"COP\";",
+									"let integrity_key = pm.environment.get(\"integrity_key\");",
+									"let signature_string = reference + amount_in_cents + currency + integrity_key;",
+									"let signature_hash = CryptoJS.SHA256(signature_string).toString(CryptoJS.enc.Hex);",
+									"pm.environment.set(\"signature\", signature_hash);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "19905695-1d82eef9-2a4c-4416-8ead-1be4d75626e3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{private_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount_in_cents\": 999999999,\n  \"currency\": \"COP\",\n  \"payment_method\": {\n    \"type\": \"PSE\",\n    \"user_type\": 0,\n    \"user_legal_id_type\": \"CC\",\n    \"user_legal_id\": \"123456789\",\n    \"financial_institution_code\": \"1001\",\n    \"payment_description\": \"Pago de prueba PSE\"\n  },\n  \"customer_email\": \"test@example.com\",\n  \"reference\": \"pago-pse-002\",\n  \"acceptance_token\": \"{{acceptance_token}}\",\n  \"signature\": \"{{signature}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PSE - Pago sin banco",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d5e3d6aa-231e-4702-8ecd-5b1bad8e0698",
+								"exec": [
+									"const delay = ms => new Promise(res => setTimeout(res, ms));",
+									"(async () => { await delay(1000); })();",
+									"const CryptoJS = require(\"crypto-js\");",
+									"let reference = \"pago-pse-003\";",
+									"let amount_in_cents = \"500000\";",
+									"let currency = \"COP\";",
+									"let integrity_key = pm.environment.get(\"integrity_key\");",
+									"let signature_string = reference + amount_in_cents + currency + integrity_key;",
+									"let signature_hash = CryptoJS.SHA256(signature_string).toString(CryptoJS.enc.Hex);",
+									"pm.environment.set(\"signature\", signature_hash);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "19905695-3523fe4d-a474-4119-a4f7-bca06224950e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{private_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount_in_cents\": 500000,\n  \"currency\": \"COP\",\n  \"payment_method\": {\n    \"type\": \"PSE\",\n    \"user_type\": 0,\n    \"user_legal_id_type\": \"CC\",\n    \"user_legal_id\": \"123456789\",\n    \"payment_description\": \"Pago de prueba PSE\"\n  },\n  \"customer_email\": \"test@example.com\",\n  \"reference\": \"pago-pse-003\",\n  \"acceptance_token\": \"{{acceptance_token}}\",\n  \"signature\": \"{{signature}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "19905695-aa4ee312-5a2b-4c3b-a186-194ea3fee89e"
+		},
+		{
+			"name": "Obtener Merchant",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"let token = pm.response.json().data.presigned_acceptance.acceptance_token;",
+							"pm.environment.set(\"acceptance_token\", token);",
+							"console.log(\"Acceptance token guardado:\", token);"
+						],
+						"id": "0c04940f-9ac3-4d81-9499-2c577fd0e83f"
+					}
+				}
+			],
+			"id": "19905695-a9d7d502-2891-4a20-b11c-8cff2fe20fbc",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/merchants/{{public_key}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"merchants",
+						"{{public_key}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
